@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type User struct{}
 
 func main() {
@@ -11,6 +9,6 @@ func main() {
 
 	m[u] = 2
 
-	fmt.Println(&m[u])
-	fmt.Println(m[&u])
+	//fmt.Println(&m[u])
+	//fmt.Println(m[&u])
 }

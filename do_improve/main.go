@@ -47,28 +47,23 @@ func fetch(ctx context.Context, u User) (string, error) {
 }
 
 func Do(ctx context.Context, users []User) (map[string]int64, error) {
-	// Создаем дочерний контекст, который мы сможем отменить вручную
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel() // Гарантируем очистку ресурсов
 
 	names := make(map[string]int64)
 	mu := sync.Mutex{}
 
-	// Канал для сбора первой ошибки
 	errChan := make(chan error, 1)
 
 	wg := sync.WaitGroup{}
 
 	for _, u := range users {
 		wg.Add(1)
-		// Передаем u в горутину явно, чтобы избежать проблем с захватом переменной
 		go func(user User) {
 			defer wg.Done()
 
-			// Передаем ctx в fetch. Если кто-то вызовет cancel(), fetch должен это обработать
 			name, err := fetch(ctx, user)
 			if err != nil {
-				// Пытаемся отправить ошибку. Если канал полон — значит ошибка уже есть.
 				select {
 				case errChan <- err:
 					cancel() // Отменяем остальные операции!
@@ -83,14 +78,12 @@ func Do(ctx context.Context, users []User) (map[string]int64, error) {
 		}(u)
 	}
 
-	// Создаем канал для сигнала о завершении всех горутин
 	done := make(chan struct{})
 	go func() {
 		wg.Wait()
 		close(done)
 	}()
 
-	// Ждем либо ошибки, либо успешного завершения всех, либо отмены внешнего контекста
 	select {
 	case err := <-errChan:
 		return nil, err
