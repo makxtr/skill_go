@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
 	for i := 0; i < 100; i++ {
@@ -11,5 +9,3 @@ func main() {
 		}(i)
 	}
 }
-
-// ключевой момент в том что main может завершится быстрее
