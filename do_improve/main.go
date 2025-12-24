@@ -12,10 +12,8 @@ import (
 
 /**
 
-* Доработать функцию Do, что бы она отрабатывала приблизительно за 10мс
-
-* при первой ошибке Do должна возвращать ошибку и завершаться
-
+* Improve the Do function, which should work within 10 ms.
+* On the first error, Do should return an error and exit.
  */
 
 type User struct {
@@ -48,7 +46,7 @@ func fetch(ctx context.Context, u User) (string, error) {
 
 func Do(ctx context.Context, users []User) (map[string]int64, error) {
 	ctx, cancel := context.WithCancel(ctx)
-	defer cancel() // Гарантируем очистку ресурсов
+	defer cancel()
 
 	names := make(map[string]int64)
 	mu := sync.Mutex{}
@@ -66,7 +64,7 @@ func Do(ctx context.Context, users []User) (map[string]int64, error) {
 			if err != nil {
 				select {
 				case errChan <- err:
-					cancel() // Отменяем остальные операции!
+					cancel()
 				default:
 				}
 				return
